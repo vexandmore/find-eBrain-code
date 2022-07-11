@@ -14,6 +14,7 @@ export default {
   methods: {
     async tryForCode() {
         var self = this;
+        self.eBrainCode = '';
         await this.USBconnect(function(msg) {
             self.eBrainCode = msg.msg.ap_ssid;
             console.log(msg.msg.ap_ssid);

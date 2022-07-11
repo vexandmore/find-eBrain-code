@@ -19,4 +19,7 @@ export default {
 </template>
 
 <style scoped>
+.result {
+  font-size: 20px;
+}
 </style>
