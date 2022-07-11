@@ -1,29 +1,27 @@
-var ebUSB = {doCallback: function(msg) {
-    document.getElementById("codeView").innerHTML = msg.msg.ap_ssid;
-    console.log(msg.msg.ap_ssid);
-}}
 var world = {};
 
 async function tryForCode() {
-  document.getElementById("codeView").innerHTML = "";
-    await USBconnect();
+    document.getElementById("codeView").innerHTML = "";
+    await USBconnect(function(msg) {
+      document.getElementById("codeView").innerHTML = msg.msg.ap_ssid;
+      console.log(msg.msg.ap_ssid);
+      });
     writeToStream(JSON.stringify({cmd: "getConfig", id: "Df4h4"}));
 }
 
-async function USBconnect() {
+async function USBconnect(cb, connected, disconnected) {
+  world.cb = cb;
   // Request & open port here.
   world.port = await navigator.serial.requestPort();
-  if (ebUSB) {
-    ebUSB.connected = true;
+  if (connected) {
+    connected();
   }
   // Wait for the port to open.
   await world.port.open({ baudRate: 230400 });
 
   // on disconnect, alert user and pause Snap!
   world.port.addEventListener('disconnect', event => {
-    if (ebUSB) {
-      ebUSB.connected = false; // signal disconnection to other code.
-    }
+    disconnected(event);
   });
 
   // Setup the output stream
@@ -43,7 +41,7 @@ async function USBconnect() {
 
 /**
  * This reads from the serial in a loop, and 
- * runs the given callbacks (using ebUSB).
+ * runs the given callback
  */
 async function readLoop() {
   world.USB = '';
@@ -61,8 +59,8 @@ async function readLoop() {
         var messages = tryParseeBrainResponse(world.USB);
         for (var i = 0; i < messages.parsed.length; i++ ) {
           var message = messages.parsed[i];
-          if (ebUSB) {
-            ebUSB.doCallback(message);
+          if (world.cb) {
+            world.cb(message);
           }
         }
         world.USB = '';
