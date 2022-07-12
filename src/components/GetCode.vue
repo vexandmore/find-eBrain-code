@@ -1,22 +1,43 @@
 <script>
 import CodeDisplay from './CodeDisplay.vue'
+import Progress from './Progress.vue'
 
 export default {
   data() {
     return {
       eBrainCode: '',
-      world: {}
+      world: {},
+      showLoading: true,
+      showCode: false,
+      progressPercent: 0
     }
   },
   components: {
-    CodeDisplay
+    CodeDisplay,
+    Progress
   },
   methods: {
+    getRandomInRange(min, max) {
+        return (Math.random() * (max - min)) + min;
+    },
     async tryForCode() {
         var self = this;
         self.eBrainCode = '';
         await this.USBconnect(function(msg) {
             self.eBrainCode = msg.msg.ap_ssid;
+            self.showLoading = true;
+            self.progressPercent = 10;
+            // fake progress
+            var increment1 = self.getRandomInRange(20, 60);
+            var increment2 = self.getRandomInRange(65, 95);
+            var delay1 = self.getRandomInRange(1000, 2000);
+            var delay2 = delay1 + self.getRandomInRange(1000, 2000);
+            var delay3 = delay2 + self.getRandomInRange(1000, 2000);
+            setTimeout(function(){self.progressPercent = increment1;}, delay1);
+            setTimeout(function(){self.progressPercent = increment2;}, delay2);
+            setTimeout(function(){self.progressPercent = 100;}, delay3);
+
+            self.showCode = true;
             console.log(msg.msg.ap_ssid);
         });
         this.writeToStream(JSON.stringify({cmd: "getConfig", id: "Df4h4"}));
@@ -134,7 +155,8 @@ export default {
 
 <template>
     <button class="btn btn-success btn-lg" @click="tryForCode">Get code!</button>
-    <CodeDisplay v-bind:eBrainCode='eBrainCode'/>
+    <CodeDisplay v-bind:eBrainCode='eBrainCode' v-if='showCode' />
+    <Progress  v-show='showLoading' v-bind:percent-complete="progressPercent"></Progress>
 </template>
 
 <style scoped>
