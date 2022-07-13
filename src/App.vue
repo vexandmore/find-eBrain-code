@@ -24,6 +24,7 @@ import GetCode from './components/GetCode.vue';
 
   padding-bottom: 30px;
   margin-top: 30px;
+  color: #333;
 }
 body {
   background-image: url("assets/patrick-hendry-lbOfqldsKEw-unsplash.jpg");
