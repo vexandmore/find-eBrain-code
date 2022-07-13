@@ -15,13 +15,15 @@ import GetCode from './components/GetCode.vue';
 .centeredContainer {
   background-color: #FFFFFF;
   border-radius: 12px;
-  width: 100%;
+  width: 90%;
   max-width: 600px;
   margin: auto;
   flex-direction: column;
   display: flex;
   align-items: center;
-
+  
+  padding-left: 5px;
+  padding-right: 5px;
   padding-bottom: 30px;
   margin-top: 30px;
   color: #333;
