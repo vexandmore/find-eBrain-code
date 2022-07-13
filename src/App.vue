@@ -21,7 +21,7 @@ import GetCode from './components/GetCode.vue';
   flex-direction: column;
   display: flex;
   align-items: center;
-  
+
   padding-left: 5px;
   padding-right: 5px;
   padding-bottom: 30px;
@@ -29,7 +29,7 @@ import GetCode from './components/GetCode.vue';
   color: #333;
 }
 body {
-  background-image: url("assets/patrick-hendry-lbOfqldsKEw-unsplash.jpg");
+  background-image: url("assets/bg-image.jpg");
   background-color: #000000;
   background-size: 100%;
 }

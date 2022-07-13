@@ -7,7 +7,6 @@ export default {
   data() {
     return {
       eBrainCode: '',
-      world: {},
       showLoading: false,
       showCode: false,
       progressPercent: 0
