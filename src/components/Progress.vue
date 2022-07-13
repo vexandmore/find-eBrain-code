@@ -6,22 +6,17 @@ export default {
     percentComplete: Number,
     color: String
   },
-  data() {
-    return {
-        barID: Math.round(Math.random() * 10000000),
-    }
-  },
   watch: {
     percentComplete(newVal, oldVal) {
-      gsap.fromTo('.meterContent',  {width: oldVal + '%'}, {width: newVal + '%', duration: 0.8});
+      gsap.fromTo(this.$refs.barContent,  {width: oldVal + '%'}, {width: newVal + '%', duration: 0.8});
     }
   }
 }
 </script>
 
 <template>
-    <div v-bind:id="barID" class="meter" ref="theBar">
-    <span class="meterContent" style="width: 0%"></span>
+    <div class="meter">
+    <span ref="barContent" style="width: 0%"></span>
     </div>
 </template>
 
