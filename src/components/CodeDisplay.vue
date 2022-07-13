@@ -1,6 +1,9 @@
 <script>
 export default {
-  props:['eBrainCode'],
+  props: {
+    eBrainCode: String,
+    currentLanguage: String
+  },
   data() {
     return {
       
@@ -9,13 +12,16 @@ export default {
   computed: {
     haveCode() {
       return this.eBrainCode !== '';
+    },
+    announcementText() {
+      return this.currentLanguage === 'en' ? "Code is: " : "Le code est: ";
     }
   }
 }
 </script>
 
 <template>
-  <p class="result">Code is: <code v-if="haveCode" class="result">{{eBrainCode}}</code> </p>
+  <p class="result">{{announcementText}} <code v-if="haveCode" class="result">{{eBrainCode}}</code> </p>
 </template>
 
 <style scoped>

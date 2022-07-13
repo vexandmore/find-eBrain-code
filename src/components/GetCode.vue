@@ -4,12 +4,20 @@ import Progress from './Progress.vue'
 import {USBconnect, writeToStream} from '../USBconnect.js'
 
 export default {
+  props: {
+    currentLanguage: String
+  },
   data() {
     return {
       eBrainCode: '',
       showLoading: false,
       showCode: false,
       progressPercent: 0
+    }
+  },
+  computed: {
+    buttonText() {
+      return this.currentLanguage === 'en' ? "Get code!" : "Obtiens le code!";
     }
   },
   components: {
@@ -49,8 +57,9 @@ export default {
 </script>
 
 <template>
-    <button class="btn btn-success btn-lg" @click="tryForCode">Get code!</button>
-    <CodeDisplay v-bind:eBrainCode='eBrainCode' v-if='showCode' />
+    <button class="btn btn-primary btn-lg" @click="tryForCode">{{buttonText}}</button>
+    
+    <CodeDisplay v-bind:eBrainCode='eBrainCode' v-bind:current-language="currentLanguage" v-if='showCode' />
     <Progress  v-show='showLoading' v-bind:percent-complete="progressPercent" color="654757"></Progress>
 </template>
 
