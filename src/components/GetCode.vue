@@ -34,8 +34,8 @@ export default {
         self.eBrainCode = msg.msg.ap_ssid;
         self.showLoading = true;
         // fake progress
-        var increment1 = self.getRandomInRange(30, 55);
-        var increment2 = self.getRandomInRange(65, 90);
+        var increment1 = self.getRandomInRange(20, 55);
+        var increment2 = self.getRandomInRange(65, 85);
         var delay1 = self.getRandomInRange(1000, 2000);
         var delay2 = delay1 + self.getRandomInRange(1000, 2000);
         var delay3 = delay2 + self.getRandomInRange(1000, 2000);

@@ -37,8 +37,11 @@ export default {
 .ldBar {
     /*Using !important is the ONLY WAY this works, for some reason this library directly sets 
     the width and height in px on the elements*/
-    width: 50%!important;
-    height: 30px!important;
+    width: 180px!important;
+    height: 50px!important;
+}
+.ldbar-label {
+  text-align: center;
 }
 .loadContainer {
     display: flex;

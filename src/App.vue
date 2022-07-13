@@ -11,7 +11,23 @@ import GetCode from './components/GetCode.vue';
 
 <style>
 @import './assets/base.css';
+
 .centeredContainer {
-    text-align: center;
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 600px;
+  margin: auto;
+  flex-direction: column;
+  display: flex;
+  align-items: center;
+
+  padding-bottom: 30px;
+  margin-top: 30px;
+}
+body {
+  background-image: url("assets/patrick-hendry-lbOfqldsKEw-unsplash.jpg");
+  background-color: #000000;
+  background-size: 100%;
 }
 </style>
