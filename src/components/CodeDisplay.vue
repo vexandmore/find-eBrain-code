@@ -21,5 +21,6 @@ export default {
 <style scoped>
 .result {
   font-size: 20px;
+  margin-top: 20px;
 }
 </style>

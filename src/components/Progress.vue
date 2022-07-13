@@ -24,12 +24,12 @@ export default {
 .meter {
   width: 90%;
 }
-/*Written by Chris Coyier, https://freefrontend.com/javascript-progress-bars/*/
+/*Written by Chris Coyier, https://css-tricks.com/css3-progress-bars/*/
 .meter {
   box-sizing: content-box;
   height: 20px; /* Can be anything */
   position: relative;
-  margin: 60px 0 20px 0; /* Just for demo spacing */
+  margin: 30px 0 20px 0; /* Just for demo spacing */
   background: #555;
   border-radius: 25px;
   padding: 10px;
