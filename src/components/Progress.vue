@@ -1,18 +1,19 @@
 <script>
 export default {
   props:{
-    percentComplete: Number
+    percentComplete: Number,
+    color: String
   },
   data() {
     return {
-        barID: Math.round(Math.random() * 10000000)
+        barID: Math.round(Math.random() * 10000000),
     }
   },
-  computed: {
-    name() {
-        return 'color: ' + color + ';';
+  /*computed: {
+    style() {
+        return 'color: ' + this.color + '; height: 50px; width: 200px;';
     }
-  },
+  },*/
   mounted: function() {
     let loadingScript = document.createElement('script');
     loadingScript.setAttribute('src', './src/components/loadingio/loading-bar.min.js');
@@ -26,12 +27,21 @@ export default {
 
 <template>
     <!-- NOTE: updating data-value does not reactively update the loading bar, I do so w/ updated-->
-  <div v-bind:id="barID" class="ldBar" v-bind:data-value="percentComplete" style="width: 100%;" data-preset="energy"></div>
+    <div class="loadContainer">
+        <div v-bind:id="barID" class="ldBar" data-preset="energy"></div>
+    </div>
 </template>
 
 <style scoped>
 @import './loadingio/loading-bar.min.css';
 .ldBar {
-    width: 100%;
+    /*Using !important is the ONLY WAY this works, for some reason this library directly sets 
+    the width and height in px on the elements*/
+    width: 50%!important;
+    height: 30px!important;
+}
+.loadContainer {
+    display: flex;
+    justify-content: center;
 }
 </style>
