@@ -38,8 +38,8 @@ export default {
 .meter > span {
   display: block;
   height: 100%;
-  border-top-right-radius: 8px;
-  border-bottom-right-radius: 8px;
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
   border-top-left-radius: 20px;
   border-bottom-left-radius: 20px;
   background-color: rgb(43, 194, 83);
