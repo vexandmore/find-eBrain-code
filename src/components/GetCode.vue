@@ -1,7 +1,7 @@
 <script>
 import CodeDisplay from './CodeDisplay.vue'
 import Progress from './Progress.vue'
-import {USBconnect, writeToStream} from '../USBconnect.js'
+import {USBconnect, writeToStream, disconnect} from '../USBconnect.js'
 
 export default {
   props: {
@@ -40,18 +40,20 @@ export default {
     whenReceiveCode(msg) {
       this.eBrainCode = msg.msg.ap_ssid;
       this.showLoading = true;
-      // fake progress
+      // fake progress setup
       var increment1 = this.getRandomInRange(20, 55);
       var increment2 = this.getRandomInRange(65, 85);
       var delay1 = this.getRandomInRange(1000, 2000);
       var delay2 = delay1 + this.getRandomInRange(1000, 2000);
       var delay3 = delay2 + this.getRandomInRange(1000, 2000);
-
+      // fake progress execution
       var self = this;
       setTimeout(function () { self.progressPercent = increment1; }, delay1);
       setTimeout(function () { self.progressPercent = increment2; }, delay2);
       setTimeout(function () { self.progressPercent = 100; }, delay3);
       setTimeout(function () { self.showCode = true; self.showLoading = false; }, delay3 + 2000);
+      // disconnect from web serial port.
+      disconnect();
     },
     showError() {
       new bootstrap.Modal('#connectionErrorModal', {}).show();

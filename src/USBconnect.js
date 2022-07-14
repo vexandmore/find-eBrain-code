@@ -1,5 +1,5 @@
 var world = {};
-export {USBconnect, writeToStream};
+export {USBconnect, writeToStream, disconnect};
 
 async function USBconnect(cb, connected, disconnected) {
     world.cb = cb;
@@ -18,17 +18,36 @@ async function USBconnect(cb, connected, disconnected) {
 
     // Setup the output stream
     const encoder = new TextEncoderStream();
-    var outputDone = encoder.readable.pipeTo(world.port.writable);
+    world.outputDone = encoder.readable.pipeTo(world.port.writable);
     world.outputStream = encoder.writable;
 
     // Make stream
     let decoder = new TextDecoderStream();
-    var inputDone = world.port.readable.pipeTo(decoder.writable);
+    world.inputDone = world.port.readable.pipeTo(decoder.writable);
     var inputStream = decoder.readable;
 
     world.reader = inputStream.getReader();
 
     readLoop(); // Start infinite read loop
+}
+
+function writeToStream(...lines) {
+    // Write to output stream
+    const writer = world.outputStream.getWriter();
+    lines.forEach((line) => {
+        console.log('[SEND]', line);
+        writer.write(line + '\n');
+    });
+    writer.releaseLock();
+}
+
+async function disconnect() {
+    world.reader.cancel();
+    await world.inputDone.catch(() => {/* ignore the error */});
+    
+    world.outputStream.getWriter().close();    
+    await world.outputDone;
+    await world.port.close();
 }
 
 /**
@@ -95,14 +114,4 @@ function tryParseeBrainResponse(jsonString) {
         }
     }
     return out;
-}
-
-function writeToStream(...lines) {
-    // Write to output stream
-    const writer = world.outputStream.getWriter();
-    lines.forEach((line) => {
-        console.log('[SEND]', line);
-        writer.write(line + '\n');
-    });
-    writer.releaseLock();
 }

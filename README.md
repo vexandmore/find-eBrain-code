@@ -1,6 +1,7 @@
 # Intro
 
-This webapp allows you to get the WiFi code of a Robot in a Can eBrain
+This webapp allows you to get the WiFi code of a Robot in a Can eBrain.
+Internet access is needed, since this project loads Bootstrap 5 from its CDN.
 ## Project Setup
 
 ```sh
@@ -18,3 +19,4 @@ npm run dev
 ```sh
 npm run build
 ```
+This needs to be served; opening index.html in a browser will not work.
