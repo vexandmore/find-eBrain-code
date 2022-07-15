@@ -34,8 +34,11 @@ export default {
       this.progressPercent = 0;
       var self = this;
       self.eBrainCode = '';
-      await USBconnect((msg) => { self.whenReceiveCode.call(self, msg); }).catch(() => self.showError());
-      writeToStream(JSON.stringify({ cmd: "getConfig", id: "Df4h4" }));
+      var errorCallback = () => self.showError();
+      await USBconnect((msg) => { self.whenReceiveCode.call(self, msg); },
+                       () =>{}, errorCallback).then(() => {
+                        writeToStream(JSON.stringify({ cmd: "getConfig", id: "Df4h4" }));
+                       }).catch(errorCallback);
     },
     whenReceiveCode(msg) {
       this.eBrainCode = msg.msg.ap_ssid;
@@ -56,7 +59,7 @@ export default {
       disconnect();
     },
     showError() {
-      new bootstrap.Modal('#connectionErrorModal', {}).show();
+      new bootstrap.Modal('#connectionErrorModal', {backdrop: true, keyboard: true, focus: true}).show();
     }
   }
 }
