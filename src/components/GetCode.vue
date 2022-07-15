@@ -1,7 +1,7 @@
 <script>
 import CodeDisplay from './CodeDisplay.vue'
 import Progress from './Progress.vue'
-import {USBconnect, writeToStream, disconnect} from '../USBconnect.js'
+import {USBconnect} from '../USBconnect.js'
 
 export default {
   props: {
@@ -12,7 +12,8 @@ export default {
       eBrainCode: '',
       showLoading: false,
       showCode: false,
-      progressPercent: 0
+      progressPercent: 0,
+      connection: {}
     }
   },
   computed: {
@@ -35,10 +36,13 @@ export default {
       var self = this;
       self.eBrainCode = '';
       var errorCallback = () => self.showError();
-      await USBconnect((msg) => { self.whenReceiveCode.call(self, msg); },
-                       () =>{}, errorCallback).then(() => {
-                        writeToStream(JSON.stringify({ cmd: "getConfig", id: "Df4h4" }));
-                       }).catch(errorCallback);
+      try {
+        this.connection = await USBconnect((msg) => { self.whenReceiveCode.call(self, msg); },
+                       () =>{}, errorCallback);  
+        this.connection.writeToStream(JSON.stringify({ cmd: "getConfig", id: "Df4h4" }));
+      } catch (e) {
+        this.showError();
+      }
     },
     whenReceiveCode(msg) {
       this.eBrainCode = msg.msg.ap_ssid;
@@ -55,8 +59,8 @@ export default {
       setTimeout(function () { self.progressPercent = increment2; }, delay2);
       setTimeout(function () { self.progressPercent = 100; }, delay3);
       setTimeout(function () { self.showCode = true; self.showLoading = false; }, delay3 + 2000);
-      // disconnect from web serial port.
-      disconnect();
+      this.connection.disconnect();
+      this.connection.disconnected = () => {};
     },
     showError() {
       new bootstrap.Modal('#connectionErrorModal', {backdrop: true, keyboard: true, focus: true}).show();

@@ -1,88 +1,96 @@
-var world = {};
-export {USBconnect, writeToStream, disconnect};
+export {USBconnect};
 
 async function USBconnect(cb, connected, disconnected) {
-    world.cb = cb;
+    var out = {};
+    addFunctions(out);
+    // set callback when receive a message
+    out.cb = cb;
+    // set other callbacks
+    out.connected = connected;
+    out.disconnected = disconnected;
     // Request & open port here.
-    world.port = await navigator.serial.requestPort();
+    out.port = await navigator.serial.requestPort();
     if (connected) {
-        connected();
+        out.connected();
     }
     // Wait for the port to open.
-    await world.port.open({ baudRate: 230400 });
+    await out.port.open({ baudRate: 230400 });
 
-    // on disconnect, alert user and pause Snap!
-    world.port.addEventListener('disconnect', event => {
-        disconnected(event);
+    // on disconnect, run callback
+    out.port.addEventListener('disconnect', event => {
+        out.disconnected(event);
     });
 
     // Setup the output stream
     const encoder = new TextEncoderStream();
-    world.outputDone = encoder.readable.pipeTo(world.port.writable);
-    world.outputStream = encoder.writable;
+    out.outputDone = encoder.readable.pipeTo(out.port.writable);
+    out.outputStream = encoder.writable;
 
     // Make stream
     let decoder = new TextDecoderStream();
-    world.inputDone = world.port.readable.pipeTo(decoder.writable);
+    out.inputDone = out.port.readable.pipeTo(decoder.writable);
     var inputStream = decoder.readable;
 
-    world.reader = inputStream.getReader();
+    out.reader = inputStream.getReader();
 
-    readLoop(); // Start infinite read loop
+    readLoop(out); // Start infinite read loop
+    return out;
 }
 
-function writeToStream(...lines) {
-    // Write to output stream
-    const writer = world.outputStream.getWriter();
-    lines.forEach((line) => {
-        console.log('[SEND]', line);
-        writer.write(line + '\n');
-    });
-    writer.releaseLock();
-}
-
-async function disconnect() {
-    world.reader.cancel();
-    await world.inputDone.catch(() => {/* ignore the error */});
+function addFunctions(out) {
+    out.writeToStream = function(...lines) {
+        // Write to output stream
+        const writer = this.outputStream.getWriter();
+        lines.forEach((line) => {
+            console.log('[SEND]', line);
+            writer.write(line + '\n');
+        });
+        writer.releaseLock();
+    }
     
-    world.outputStream.getWriter().close();    
-    await world.outputDone;
-    await world.port.close();
+    out.disconnect = async function() {
+        this.reader.cancel();
+        await this.inputDone.catch(() => {/* ignore the error */});
+        
+        this.outputStream.getWriter().close();    
+        await this.outputDone;
+        await this.port.close();
+    }
 }
 
 /**
  * This reads from the serial in a loop, and 
  * runs the given callback
  */
-async function readLoop() {
-    world.USB = '';
+async function readLoop(out) {
+    out.USB = '';
     console.log("USB Reader Listening...");
 
     while (true) {
-        const { value, done } = await world.reader.read();
+        const { value, done } = await out.reader.read();
         if (value) {
-            world.USB += value;
+            out.USB += value;
             console.log(value + '\n');
 
             // Now, I check if the JSON is complete and respond to the callback if necessary
             // and remove the message from the stack
-            if (world.USB.includes('}')) {
-                var messages = tryParseeBrainResponse(world.USB);
+            if (out.USB.includes('}')) {
+                var messages = tryParseeBrainResponse(out.USB);
                 for (var i = 0; i < messages.parsed.length; i++) {
                     var message = messages.parsed[i];
-                    if (world.cb) {
-                        world.cb(message);
+                    if (out.cb) {
+                        out.cb(message);
                     }
                 }
-                world.USB = '';
+                out.USB = '';
                 if (messages.unparseable) {
-                    world.USB = messages.unparseable;
+                    out.USB = messages.unparseable;
                 }
             }
         }
         if (done) {
             console.log('[readLoop] DONE', done);
-            world.reader.releaseLock();
+            out.reader.releaseLock();
             break;
         }
     }
