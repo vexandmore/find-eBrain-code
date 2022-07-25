@@ -36,16 +36,21 @@ export default {
       var self = this;
       self.eBrainCode = '';
       var errorCallback = () => self.showError();
+      this.connection = null;
       try {
         this.connection = await USBconnect((msg) => { self.whenReceiveCode.call(self, msg); },
                        () =>{}, errorCallback);
+        this.receiveTimeout = setTimeout(() => {
+          this.disconnectShowError();
+        }, 2000);
         this.showLoading = true;
         this.connection.writeToStream(JSON.stringify({ cmd: "getConfig", id: "Df4h4" }));
       } catch (e) {
-        this.showError();
+        this.disconnectShowError();
       }
     },
     whenReceiveCode(msg) {
+      clearTimeout(this.receiveTimeout);
       this.eBrainCode = msg.msg.ap_ssid;
       // fake progress setup
       var increment1 = this.getRandomInRange(20, 55);
@@ -62,8 +67,13 @@ export default {
       this.connection.disconnect(); // disconnect
       this.connection.disconnected = () => {}; // disable error message that would otherwise show up when it's unplugged.
     },
-    showError() {
+    disconnectShowError() {
+      if (this.connection != null) {
+        this.connection.disconnect();
+      }
       new bootstrap.Modal('#connectionErrorModal', {backdrop: true, keyboard: true, focus: true}).show();
+      this.showLoading = false;
+      this.progressPercent = 0;
     }
   }
 }
