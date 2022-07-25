@@ -32,13 +32,14 @@ export default {
     async tryForCode() {
       this.showLoading = false;
       this.showCode = false;
-      this.progressPercent = 0;
+      this.progressPercent = 1;
       var self = this;
       self.eBrainCode = '';
       var errorCallback = () => self.showError();
       try {
         this.connection = await USBconnect((msg) => { self.whenReceiveCode.call(self, msg); },
-                       () =>{}, errorCallback);  
+                       () =>{}, errorCallback);
+        this.showLoading = true;
         this.connection.writeToStream(JSON.stringify({ cmd: "getConfig", id: "Df4h4" }));
       } catch (e) {
         this.showError();
@@ -46,7 +47,6 @@ export default {
     },
     whenReceiveCode(msg) {
       this.eBrainCode = msg.msg.ap_ssid;
-      this.showLoading = true;
       // fake progress setup
       var increment1 = this.getRandomInRange(20, 55);
       var increment2 = this.getRandomInRange(65, 85);
@@ -59,8 +59,8 @@ export default {
       setTimeout(function () { self.progressPercent = increment2; }, delay2);
       setTimeout(function () { self.progressPercent = 100; }, delay3);
       setTimeout(function () { self.showCode = true; self.showLoading = false; }, delay3 + 2000);
-      this.connection.disconnect();
-      this.connection.disconnected = () => {};
+      this.connection.disconnect(); // disconnect
+      this.connection.disconnected = () => {}; // disable error message that would otherwise show up when it's unplugged.
     },
     showError() {
       new bootstrap.Modal('#connectionErrorModal', {backdrop: true, keyboard: true, focus: true}).show();
