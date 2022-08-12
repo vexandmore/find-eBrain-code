@@ -10,8 +10,9 @@ export default {
   data() {
     return {
       eBrainCode: '',
-      showLoading: false,
-      showCode: false,
+      loadingVisible: false,
+      codeVisible: false,
+      buttonEnabled: true,
       progressPercent: 0,
       connection: {}
     }
@@ -30,8 +31,9 @@ export default {
       return (Math.random() * (max - min)) + min;
     },
     async tryForCode() {
-      this.showLoading = false;
-      this.showCode = false;
+      this.buttonEnabled = false;
+      this.loadingVisible = false;
+      this.codeVisible = false;
       this.progressPercent = 1;
       var self = this;
       self.eBrainCode = '';
@@ -43,7 +45,7 @@ export default {
         this.receiveTimeout = setTimeout(() => {
           this.disconnectShowError();
         }, 2000);
-        this.showLoading = true;
+        this.loadingVisible = true;
         this.connection.writeToStream(JSON.stringify({ cmd: "getConfig", id: "Df4h4" }));
       } catch (e) {
         this.disconnectShowError();
@@ -63,7 +65,7 @@ export default {
       setTimeout(function () { self.progressPercent = increment1; }, delay1);
       setTimeout(function () { self.progressPercent = increment2; }, delay2);
       setTimeout(function () { self.progressPercent = 100; }, delay3);
-      setTimeout(function () { self.showCode = true; self.showLoading = false; }, delay3 + 2000);
+      setTimeout(self.showCode, delay3 + 2000);
       this.connection.disconnect(); // disconnect
       this.connection.disconnected = () => {}; // disable error message that would otherwise show up when it's unplugged.
     },
@@ -72,8 +74,17 @@ export default {
         this.connection.disconnect();
       }
       new bootstrap.Modal('#connectionErrorModal', {backdrop: true, keyboard: true, focus: true}).show();
-      this.showLoading = false;
+      this.reset();
+    },
+    showCode() {
+      this.codeVisible = true;
+      this.loadingVisible = false;
+      this.buttonEnabled = true;
+    },
+    reset() {
+      this.loadingVisible = false;
       this.progressPercent = 0;
+      this.buttonEnabled = true;
     }
   }
 }
@@ -98,10 +109,11 @@ export default {
     </div>
   </div>
   <!-- These are the main parts the user sees -->
-  <button class="btn btn-primary btn-lg" @click="tryForCode">{{buttonText}}</button>
+  <button v-if="buttonEnabled" class="btn btn-primary btn-lg" @click="tryForCode">{{buttonText}}</button>
+  <button v-else class="btn btn-primary btn-lg" @click="tryForCode" disabled>{{buttonText}}</button>
 
-  <CodeDisplay v-bind:eBrainCode='eBrainCode' v-bind:current-language="currentLanguage" v-if='showCode' />
-  <Progress v-show='showLoading' v-bind:percent-complete="progressPercent" color="654757"></Progress>
+  <CodeDisplay v-bind:eBrainCode='eBrainCode' v-bind:current-language="currentLanguage" v-if='codeVisible' />
+  <Progress v-show='loadingVisible' v-bind:percent-complete="progressPercent" color="654757"></Progress>
 </template>
 
 <style scoped>
